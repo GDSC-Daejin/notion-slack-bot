@@ -40,12 +40,8 @@ def read_database(database_id):
 
     datas = response.json()["results"]
     today = datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d")
-    tomorrow = (datetime.now(timezone(timedelta(hours=9))) + timedelta(1)).strftime(
-        "%Y-%m-%d"
-    )
-    week = (datetime.now(timezone(timedelta(hours=9))) + timedelta(7)).strftime(
-        "%Y-%m-%d"
-    )
+    tomorrow = (datetime.now(timezone(timedelta(hours=9))) + timedelta(1)).strftime("%Y-%m-%d")
+    week = (datetime.now(timezone(timedelta(hours=9))) + timedelta(7)).strftime("%Y-%m-%d")
     print(response)
     for data in datas:
         try:
@@ -54,15 +50,12 @@ def read_database(database_id):
             start_date = data["properties"]["Date"]["date"]["start"]
             end_date = data["properties"]["Date"]["date"].get("end")
             url = data["url"]
-            positions = [
-                p["name"] for p in data["properties"]["Event Type"]["multi_select"]
-            ]
+            positions = [p["name"] for p in data["properties"]["Event Type"]["multi_select"]]
 
             channel = get_channel(positions)
 
         except Exception as e:
-            # print(e,title)
-            pass
+            continue
 
         if title != "" and start_date != "":
             try:
