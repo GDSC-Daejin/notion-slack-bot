@@ -17,5 +17,6 @@ jobs:
       - name: Install dependencies
         run: |
           cd ~/notion-slack-bot/
+          git stash
           git pull -f
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
