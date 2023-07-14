@@ -49,6 +49,7 @@ def read_database(database_id):
             file_path = title + ".ics"
             start_date = data["properties"]["Date"]["date"]["start"]
             end_date = data["properties"]["Date"]["date"].get("end")
+            ThreadUrl = data["properties"]["슬렉 쓰레드 링크"]["url"]
             url = data["url"]
             positions = [p["name"] for p in data["properties"]["Event Type"]["multi_select"]]
 
@@ -105,6 +106,7 @@ def read_database(database_id):
                                 positions,
                                 url,
                                 file_path,
+                                ThreadUrl,
                             )
                     else:
                         post_message(
@@ -116,6 +118,7 @@ def read_database(database_id):
                             positions,
                             url,
                             file_path,
+                            ThreadUrl,
                         )
 
                     os.remove(file_path)

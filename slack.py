@@ -5,17 +5,8 @@ from channel import EVENT
 
 
 def post_message(
-    channel, isToday, title, start_date, end_date, position, url, file_path
+    channel, isToday, title, start_date, end_date, position, url, file_path, threadurl
 ):
-    """슬랙 메시지 전송"""
-    client = WebClient(token=MY_TOKEN)
-    mention = ""
-    if position:
-        position = "*" + position + "*"
-    if not position:
-        position = " "
-    if isToday.count("[오늘]"):
-        mention = "@channel" + "\n"
     blocks = [
         {
             "type": "header",
@@ -30,15 +21,43 @@ def post_message(
             "elements": [{"type": "mrkdwn", "text": "*🕘* " + start_date + end_date}],
         },
         {"type": "divider"},
+    ]
+    mention = ""
+    if isToday.count("[오늘]"):
+        mention = "@channel" + "\n"
+        mention_blocks = [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": f"{mention}",
+                },
+            },
+        ]
+        blocks.extend(mention_blocks)
+
+    """슬랙 메시지 전송"""
+    client = WebClient(token=MY_TOKEN)
+
+    fields = []
+
+    if position:
+        position = "*" + position + "*"
+        fields.append({"type": "mrkdwn", "text": position})
+
+    if url:
+        fields.append({"type": "mrkdwn", "text": f" <{url}|슬랙 링크> "})
+    if threadurl:
+        fields.append({"type": "mrkdwn", "text": f" <{threadurl}|[관련 쓰레드]> "})
+    thread_blocks = [
         {
             "type": "section",
-            "fields": [
-                {"type": "mrkdwn", "text": f"{mention} <{url}|노션 링크> "},
-                {"type": "mrkdwn", "text": position},
-            ],
-        },
+            "fields": fields,
+        }
     ]
 
+    if fields:
+        blocks.extend(thread_blocks)
     button_blocks = [
         {
             "type": "section",
@@ -77,9 +96,7 @@ def post_message(
         #     mention = "@channel"
         if channel != EVENT:
             blocks.extend(button_blocks)
-    response = client.chat_postMessage(
-        channel=channel, text="fallback text message", blocks=blocks
-    )
+    response = client.chat_postMessage(channel=channel, text="fallback text message", blocks=blocks)
     latest_ts = None
     conversation_history = client.conversations_history(channel=channel)
     for message in conversation_history["messages"]:
